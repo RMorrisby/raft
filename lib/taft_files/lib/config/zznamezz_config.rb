@@ -1,6 +1,9 @@
 # Holds system configuration parameters
 
+require_relative 'runtime_constants.rb'
+
 class ZZnamezzConfig
+    include RuntimeConstants
     
     CERTIFICATE_DIR = "certs"
 
@@ -13,4 +16,7 @@ class ZZnamezzConfig
 
     SERVER = SERVERS[$TEST_ENV]
 
+
+    PASSED = "Passed"
+    FAILED = "Failed"
 end

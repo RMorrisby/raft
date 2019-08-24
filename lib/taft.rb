@@ -3,10 +3,10 @@ require 'pathname'
 require 'more_ruby'
 
 def pd(s)
-    puts s if $RAFT_DEBUGGING
+    puts s if $TAFT_DEBUGGING
 end
 
-class Raft
+class Taft
     TEMPLATE_PROJECT_NAME_REGEX = /(zznamezz)/ # e.g. bluesky if one word, blue_sky if two # regex to use when matching a template file name
     TEMPLATE_PROJECT_NAME_UPPERCASE_REGEX = /(ZZnamezz)/ # e.g. Bluesky if one word, BlueSky if two # regex to use when matching a template file name
     TEMPLATE_PROJECT_ABBREV_REGEX = /(xxabbrevxx)/ # e.g. bs # regex to use when matching a template file name
@@ -32,10 +32,10 @@ class Raft
     end
 
     def self.install(lang = nil, debugging = false, dest = "", overwrite_ok = false, project_name = "", project_abbrev = "")
-        $RAFT_DEBUGGING = true if debugging
+        $TAFT_DEBUGGING = true if debugging
 
         unless dest.empty?
-            puts "RAFT.install has been called with the following parameters :"
+            puts "TAFT.install has been called with the following parameters :"
             puts "Language             : #{lang}"
             puts "Project name         : #{project_name}"
             puts "Project abbreviation : #{project_abbrev}"
@@ -50,17 +50,17 @@ class Raft
         if lang == nil
             puts "\nPlease enter the language of this project : #{LANGUAGES.join(", ")}"
             lang = gets.chomp.downcase.to_sym
-            raise "RAFT cannot install a new project in that language" unless LANGUAGES.include?(lang)
+            raise "TAFT cannot install a new project in that language" unless LANGUAGES.include?(lang)
         end
 
         if dest.empty?
-            puts "\nPlease enter the path of the base folder that RAFT should create, up to and including the name of the base folder"
-            puts "RAFT will create this folder if it does not exist"
+            puts "\nPlease enter the path of the base folder that TAFT should create, up to and including the name of the base folder"
+            puts "TAFT will create this folder if it does not exist"
             puts "If a relative path is entered, it will be taken as being relative to path : #{Dir.getwd}"
             dest = gets.chomp
             raise "The base folder path entered was empty" if dest.empty?
 
-            puts "Does this folder already exist? Entering Y will grant RAFT permission to write into that folder, overwriting any files with matching names that are aready present."
+            puts "Does this folder already exist? Entering Y will grant TAFT permission to write into that folder, overwriting any files with matching names that are aready present."
             folder_exists = gets.chomp
 
             overwrite_ok = (folder_exists == "Y")
@@ -69,11 +69,11 @@ class Raft
 
         case lang
         when :ruby
-            raw_file_path = "#{File.expand_path(File.dirname(__FILE__))}/raft_files"
+            raw_file_path = "#{File.expand_path(File.dirname(__FILE__))}/taft_files"
             bundled_gem_path = "#{File.expand_path(File.dirname(__FILE__))}/bundled_gems"
             install_gems(bundled_gem_path)
         when :java
-            raw_file_path = "#{File.expand_path(File.dirname(__FILE__))}/java_raft_files"
+            raw_file_path = "#{File.expand_path(File.dirname(__FILE__))}/java_taft_files"
         end
 
         # TODO does this handle dests like "~/foo" ?
@@ -83,9 +83,9 @@ class Raft
             dest_base_folder = File.join(Dir.getwd, dest)
         end
         dest_base_folder = File.expand_path(dest_base_folder)
-        puts "RAFT will install to #{dest_base_folder}"
+        puts "TAFT will install to #{dest_base_folder}"
 
-        raise "Folder #{dest_base_folder} already exists, and you did not grant RAFT permission to write into the folder" if Dir.exists?(dest_base_folder) && !overwrite_ok
+        raise "Folder #{dest_base_folder} already exists, and you did not grant TAFT permission to write into the folder" if Dir.exists?(dest_base_folder) && !overwrite_ok
 
         # Create the base folder
         begin
@@ -111,14 +111,14 @@ class Raft
         @project_abbrev_uppercase_part = @project_abbrev_part.upcase
 
         # Now sweep over the copied files, adjusting the names accordingly
-        RAFT.adjust_file_names(dest_base_folder, project_name, project_abbrev)
+        TAFT.adjust_file_names(dest_base_folder, project_name, project_abbrev)
 
         # Now sweep over the copied files, adjusting the contents accordingly
-        RAFT.adjust_file_contents(dest_base_folder, project_name, project_abbrev)
+        TAFT.adjust_file_contents(dest_base_folder, project_name, project_abbrev)
 
         puts "\nFiles have been tailored to your project."
 
-        puts "\nRAFT has installed a tailored copy of the #{lang.capitalize} Automation Framework to #{dest_base_folder}"
+        puts "\nTAFT has installed a tailored copy of the #{lang.capitalize} Automation Framework to #{dest_base_folder}"
         puts "Installation complete."
     end
 
@@ -138,7 +138,7 @@ class Raft
                 f = File.expand_path(f)
                 pd "Now looking at #{f}; is dir? #{Dir.exists?(f)}"
                 if Dir.exists?(f) # if this is a dir, call recursively
-                    RAFT.adjust_file_names(f, project_name, project_abbrev)
+                    TAFT.adjust_file_names(f, project_name, project_abbrev)
                 end
 
                 # After processing the contents of the directory, rename it
@@ -165,7 +165,7 @@ class Raft
                         new_f += ext # must add the extension back on
                         new_f = File.join(dir, new_f) # this is the full path
                         pd "Will rename #{f}\n to       #{new_f}"
-                        RAFT.delete_file(new_f)
+                        TAFT.delete_file(new_f)
                         File.rename(f, new_f)
                     end
                 end
@@ -194,7 +194,7 @@ class Raft
                 f = File.expand_path(f)
                 pd "Now looking at #{f}; is dir? #{Dir.exists?(f)}"
                 if Dir.exists?(f) # if this is a dir, call recursively
-                    RAFT.adjust_file_contents(f, project_name, project_abbrev)
+                    TAFT.adjust_file_contents(f, project_name, project_abbrev)
                 end
 
                 lines = []
@@ -240,7 +240,7 @@ class Raft
     end
 
     def self.install_gems(bundled_gem_path)
-        puts "\nWill first install all gems bundled in with the RAFT gem."
+        puts "\nWill first install all gems bundled in with the TAFT gem."
 
         gem_list = Dir.entries(bundled_gem_path)
         gem_list.delete(".")
